@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSB Hospital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Hospital-themed color palette */
+        body {
+            background: linear-gradient(to bottom, #e6f0fa, #ffffff); /* Soft blue-to-white gradient */
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            margin: 80px auto;
+            text-align: center;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d4e6f1; /* Light blue border */
+        }
+        h1 {
+            color: #007bff; /* Primary blue */
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        h1 i {
+            color: #28a745; /* Green for health */
+            margin-right: 10px;
+        }
+        p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px; /* Rounded buttons */
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+        .btn-register {
+            background-color: #28a745; /* Green for register */
+        }
+        .btn-register:hover {
+            background-color: #218838;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+        /* Hospital-themed header decoration */
+        .header-decoration {
+            width: 100px;
+            height: 4px;
+            background-color: #007bff;
+            margin: 0 auto 20px;
+            border-radius: 2px;
+        }
+        /* Footer text for subtle branding */
+        .footer-text {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-decoration"></div>
+        <h1><i class="fas fa-hospital"></i> Welcome to SSB Hospital</h1>
+        <p>Your trusted partner in healthcare management. Please login or register to access our services.</p>
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-register">Register</a>
+        <div class="footer-text">© 2025 SSB Hospital - Caring for You</div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

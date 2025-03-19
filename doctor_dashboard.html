@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSB Hospital - Doctor Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f8fb; font-family: Arial, sans-serif; }
+        .dashboard-container { display: flex; min-height: 100vh; margin: 0; }
+        .sidebar { width: 250px; background-color: #007bff; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); }
+        .sidebar-header h2 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+        .sidebar-nav a { display: block; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-bottom: 10px; text-align: center; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #0056b3; }
+        .main-content { flex-grow: 1; padding: 20px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; }
+        h1, h2 { color: #007bff; text-align: center; }
+        .btn-primary { background-color: #007bff; border: none; padding: 5px 10px; border-radius: 5px; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .table th { background-color: #007bff; color: white; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        .form-label { color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Welcome, Dr. {{ user.username }}</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#availability" class="active">Set Availability</a>
+                <a href="#appointments">Your Appointments</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <h1>Doctor Dashboard</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <section id="availability" class="card">
+                <h2>Your Availability</h2>
+<table border="1">
+    <tr><th>Date</th><th>Slots</th></tr>
+    {% for avail in availability %}
+        <tr>
+            <td>{{ avail.date }}</td>
+            <td>{{ avail.slots }}</td>
+        </tr>
+    {% endfor %}
+</table>
+                <form method="POST" action="{{ url_for('set_availability') }}" class="p-3 border rounded bg-light">
+                    <div class="mb-3">
+                        <label class="form-label">Date (YYYY-MM-DD):</label>
+                        <input type="text" name="date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Slots (e.g., 09:00-10:00):</label>
+                        <input type="text" name="slots" class="form-control" placeholder="Comma-separated slots" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Set Availability</button>
+                </form>
+            </section>
+            <section id="appointments" class="card">
+                <h2>Your Appointments</h2>
+                {% if appointments %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                                <th>Insurance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apt in appointments %}
+                                <tr>
+                                    <td>{{ apt.patient_username }}</td>
+                                    <td>{{ apt.date }}</td>
+                                    <td>{{ apt.status }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('update_appointment') }}">
+                                            <input type="hidden" name="apt_id" value="{{ apt.id }}">
+                                            <select name="status" class="form-select form-select-sm mb-2">
+                                                <option value="Pending" {% if apt.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                <option value="Approved" {% if apt.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                                <option value="Rejected" {% if apt.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        {% if apt.status == 'Approved' and apt.insurance_status != 'Processed' %}
+                                            <form method="POST" action="{{ url_for('submit_insurance') }}">
+                                                <input type="hidden" name="apt_id" value="{{ apt.id }}">
+                                                <button type="submit" class="btn btn-primary btn-sm">Submit to Insurer</button>
+                                            </form>
+                                        {% else %}
+                                            {{ apt.insurance_status|default('Pending') }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-center text-muted">No appointments scheduled.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

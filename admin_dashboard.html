@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSB Hospital - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f8fb; font-family: Arial, sans-serif; }
+        .dashboard-container { display: flex; min-height: 100vh; margin: 0; }
+        .sidebar { width: 250px; background-color: #007bff; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); }
+        .sidebar-header h2 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+        .sidebar-nav a { display: block; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-bottom: 10px; text-align: center; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #0056b3; }
+        .main-content { flex-grow: 1; padding: 20px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; }
+        h1, h2 { color: #007bff; text-align: center; }
+        .btn-primary { background-color: #007bff; border: none; padding: 10px; border-radius: 5px; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-danger { background-color: #dc3545; border: none; padding: 5px 10px; border-radius: 5px; }
+        .btn-danger:hover { background-color: #a71d2a; }
+        .btn-success { background-color: #28a745; border: none; padding: 5px 10px; border-radius: 5px; }
+        .btn-success:hover { background-color: #1e7e34; }
+        .table th { background-color: #007bff; color: white; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        .form-label { color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Welcome, {{ user.username }}</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#users" class="active">Manage Users</a>
+                <a href="#orders">Place Orders</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <h1>Admin Dashboard</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <section id="users" class="card">
+                <h2>Add New User</h2>
+                <form method="POST" action="{{ url_for('add_user') }}" class="p-3 border rounded bg-light">
+                    <div class="mb-3">
+                        <label class="form-label">Username:</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password:</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role:</label>
+                        <select name="role" class="form-select" required>
+                            <option value="admin">Admin</option>
+                            <option value="doctor">Doctor</option>
+                            <option value="patient">Patient</option>
+                            <option value="insurer">Insurer</option>
+                            <option value="supplier">Supplier</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email:</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Add User</button>
+                </form>
+                <h2 class="mt-4">All Users</h2>
+                {% if users %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Email</th>
+                                <th>Approved</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.role.capitalize() }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ 'Yes' if user.approved else 'No' }}</td>
+                                    <td>
+                                        {% if not user.approved %}
+                                            <form method="POST" action="{{ url_for('approve_user') }}" style="display:inline;">
+                                                <input type="hidden" name="username" value="{{ user.username }}">
+                                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                            </form>
+                                        {% endif %}
+                                        <form method="POST" action="{{ url_for('delete_user') }}" onsubmit="return confirm('Are you sure you want to delete {{ user.username }}?');" style="display:inline;">
+                                            <input type="hidden" name="username" value="{{ user.username }}">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-center text-muted">No users registered.</p>
+                {% endif %}
+            </section>
+            <section id="orders" class="card">
+                <h2>Place Supply Order</h2>
+                <form method="POST" action="{{ url_for('place_order') }}" class="p-3 border rounded bg-light">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label class="form-label">Supplier Username:</label>
+                        {{ form.supplier_username(class="form-control", required=True) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Item:</label>
+                        {{ form.item(class="form-control", required=True) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity:</label>
+                        {{ form.quantity(class="form-control", required=True) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Order Date (YYYY-MM-DD):</label>
+                        {{ form.order_date(class="form-control", required=True) }}
+                    </div>
+                    {{ form.submit(class="btn btn-primary w-100") }}
+                </form>
+                <h2 class="mt-4">All Orders</h2>
+                {% if orders %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.supplier_username }}</td>
+                                    <td>{{ order.item }}</td>
+                                    <td>{{ order.quantity }}</td>
+                                    <td>{{ order.order_date }}</td>
+                                    <td>{{ order.status }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-center text-muted">No orders placed yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
