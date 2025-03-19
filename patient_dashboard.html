@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSB Hospital - Patient Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f8fb; font-family: Arial, sans-serif; }
+        .dashboard-container { display: flex; min-height: 100vh; margin: 0; }
+        .sidebar { width: 250px; background-color: #007bff; color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); }
+        .sidebar-header h2 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+        .sidebar-nav a { display: block; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-bottom: 10px; text-align: center; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #0056b3; }
+        .main-content { flex-grow: 1; padding: 20px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px; margin-bottom: 20px; }
+        h1, h2 { color: #007bff; text-align: center; }
+        .btn-primary { background-color: #007bff; border: none; padding: 10px; border-radius: 5px; width: 100%; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .table th { background-color: #007bff; color: white; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        .form-label { color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Welcome, {{ user.username }}</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#book-appointment" class="active">Book Appointment</a>
+                <a href="#appointments">Your Appointments</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <h1>Patient Dashboard</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <section id="book-appointment" class="card">
+                <h2>Book Appointment</h2>
+                <form method="POST" action="{{ url_for('book_appointment') }}" class="p-3 border rounded bg-light">
+                    <div class="mb-3">
+                        <label class="form-label">Doctor Username:</label>
+                        <input type="text" name="doctor" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date (YYYY-MM-DD):</label>
+                        <input type="text" name="date" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Book</button>
+                </form>
+            </section>
+            <section id="appointments" class="card">
+                <h2>Your Appointments</h2>
+                {% if appointments %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Doctor</th>
+                                <th>Status</th>
+                                <th>Insurance Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apt in appointments %}
+                                <tr>
+                                    <td>{{ apt.date }}</td>
+                                    <td>{{ apt.doctor_username }}</td>
+                                    <td>{{ apt.status }}</td>
+                                    <td>{{ apt.insurance_status|default('Pending') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-center text-muted">No appointments booked yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
