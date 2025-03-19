@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}SSB Hospital - Verify OTP{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-4" style="border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border: 1px solid #d4e6f1;">
+                <div class="card-body">
+                    <div class="header-decoration"></div>
+                    <h1 class="text-center"><i class="fas fa-key"></i> Verify OTP</h1>
+                    <p class="text-center">An OTP has been sent to your email. Please enter it below to proceed.</p>
+                    <form method="POST" action="{{ url_for('verify_otp') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #007bff;">OTP:</label>
+                            {{ form.otp(class="form-control", required=True, placeholder="Enter 6-digit OTP", style="border-radius: 10px;") }}
+                        </div>
+                        {{ form.submit(class="btn btn-primary w-100", style="border-radius: 25px; padding: 12px; font-size: 1.1rem; font-weight: 500; text-transform: uppercase; transition: all 0.3s ease;") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Hospital-themed overrides */
+        body {
+            background: linear-gradient(to bottom, #e6f0fa, #ffffff); /* Matches index.html */
+        }
+        .card {
+            background: #ffffff;
+        }
+        h1 {
+            color: #007bff;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        h1 i {
+            color: #28a745; /* Green icon for health */
+            margin-right: 10px;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+        .header-decoration {
+            width: 80px;
+            height: 4px;
+            background-color: #007bff;
+            margin: 0 auto 20px;
+            border-radius: 2px;
+        }
+    </style>
+{% endblock %}
